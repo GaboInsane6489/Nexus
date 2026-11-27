@@ -1,6 +1,6 @@
 # 00 — Contexto Maestro del Proyecto y Catálogo de Skills
 
-> **Propósito de este documento**: Servir como punto de entrada cognitivo para desarrolladores y agentes de IA a lo largo de todos los meses de construcción de **Nexus**. Explica cómo está organizado el conocimiento del proyecto, cómo operan las reglas automáticas (`AGENTS.md`) y cuándo activar cada una de las 5 **Skills** del workspace.
+> **Propósito de este documento**: Servir como punto de entrada cognitivo para desarrolladores y agentes de IA a lo largo de todos los meses de construcción de **Nexus**. Explica cómo está organizado el conocimiento del proyecto, cómo operan las reglas automáticas (`AGENTS.md`) y cuándo activar cada una de las 6 **Skills** del workspace.
 
 ---
 
@@ -8,7 +8,7 @@
 
 Un sistema que combina un **ERP Académico** con un **LMS Comercial Gamificado** fracasa si se intenta programar de forma monolítica o improvisada. Por ello, **Nexus** se rige por cuatro principios de ingeniería:
 
-1. **Documentación Primero (Docs-Driven Development)**: Ninguna tabla, endpoint o pantalla se programa sin estar definida en los documentos `01` al `06` de `/docs`.
+1. **Documentación Primero (Docs-Driven Development)**: Ninguna tabla, endpoint o pantalla se programa sin estar definida en los documentos `01` al `07` de `/docs`.
 2. **Modularidad Estricta por Dominios**: El sistema se divide en módulos independientes (`iam`, `catalog`, `commerce`, `academic-erp`, `gamification`, `certificates`, `analytics`) gobernados por un grafo acíclico de dependencias (Niveles 0 al 4).
 3. **Integridad en la Base de Datos (Database-First Invariants)**: Los cálculos financieros, los promedios ponderados de calificaciones, los umbrales de asistencia, la idempotencia del XP y los bloqueos de actas viven en **PostgreSQL (Supabase)** mediante funciones transaccionales y políticas **RLS**, nunca confiando ciegamente en el cliente.
 4. **Memoria Persistente para IA (Context & Skills)**: Cualquier sesión de trabajo futura carga automáticamente las reglas de [`AGENTS.md`](../AGENTS.md) y dispone de skills especializadas en [`.agents/skills/`](../.agents/skills/).
@@ -25,6 +25,7 @@ flowchart LR
     end
 
     subgraph Skills["Skills Bajo Demanda (.agents/skills/)"]
+        S0["nexus-deductive-verification"]
         S1["nexus-architecture-guard"]
         S2["nexus-supabase-dba"]
         S3["nexus-academic-erp-engine"]
@@ -39,6 +40,7 @@ flowchart LR
         D4["04. Diagramas de Procesos"]
         D5["05. Lógica Funcional y Motores"]
         D6["06. Roadmap por Fases"]
+        D7["07. Sistema de Diseño y UX/UI"]
     end
 
     Contexto --> Skills

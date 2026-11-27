@@ -172,3 +172,60 @@ export async function getCurriculumDagSnapshot(): Promise<{
 
   return { terms, paths, courses, edges };
 }
+
+export async function listUserCompletedCourseIds(studentId: string): Promise<string[]> {
+  const supabase = await createSupabaseServerClient();
+  const { data: enrollments } = await supabase
+    .from('enrollments')
+    .select('cohort_id')
+    .eq('student_id', studentId)
+    .eq('status', 'completed');
+
+  const cohortIds = (enrollments ?? []).map((row) => row.cohort_id);
+  if (cohortIds.length === 0) {
+    return [];
+  }
+
+  const { data: cohorts } = await supabase
+    .from('cohorts')
+    .select('course_id')
+    .in('id', cohortIds);
+
+  const uniqueCourseIds = new Set<string>();
+  for (const cohort of cohorts ?? []) {
+    uniqueCourseIds.add(cohort.course_id);
+  }
+
+  return Array.from(uniqueCourseIds);
+}
+
+export async function getActiveAcademicTerm(): Promise<AcademicTermEntity | null> {
+  const supabase = await createSupabaseServerClient();
+  const { data } = await supabase
+    .from('academic_terms')
+    .select('id, code, name, start_date, end_date, status')
+    .neq('status', 'closed')
+    .order('start_date', { ascending: true })
+    .limit(20);
+
+  const rows = data ?? [];
+  if (rows.length === 0) {
+    return null;
+  }
+
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const selected =
+    rows.find((row) => row.status === 'in_progress') ??
+    rows.find((row) => row.status === 'enrollment_open') ??
+    rows.find((row) => row.start_date >= todayIso) ??
+    rows[0];
+
+  return {
+    id: selected.id,
+    code: selected.code,
+    name: selected.name,
+    startDate: selected.start_date,
+    endDate: selected.end_date,
+    status: selected.status,
+  };
+}

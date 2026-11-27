@@ -1,6 +1,6 @@
-# 07 — Sistema de Diseño, Arquitectura Responsive y UX Interactiva (Obsidian & Neon Silver)
+# 07 — Sistema de Diseño, Arquitectura Responsive y UX Interactiva (Luminous Alabaster, Liquid Platinum & Obsidian Ink)
 
-> **Propósito de este documento**: Definir la identidad visual **Obsidian Black & Plateado Neón (Liquid Chrome)**, el sistema de **iconografía vectorial moderna (Cero Emojis)**, la **arquitectura responsive fluida multi-dispositivo en Tailwind CSS v4 (sin valores hardcoded)** y los patrones de **interactividad dinámica** de **Nexus**.
+> **Propósito de este documento**: Definir la identidad visual **Luminous Alabaster (`#F3F5F9`), Liquid Platinum (`card-glass`) & Obsidian Ink (`#090B0F`)** con acento ámbar (`#D97706`) y tipografía `Playfair Display` + `Plus Jakarta Sans` + `JetBrains Mono`, el sistema de **iconografía vectorial moderna (Cero Emojis)**, la **arquitectura responsive fluida multi-dispositivo en Tailwind CSS v4 (sin valores hardcoded)** y los patrones de **interactividad dinámica** de **Nexus**.
 
 ---
 
@@ -11,17 +11,19 @@ Para proyectar una imagen tecnológica de primer nivel que supere los estándare
 1. **Política Estricta de Cero Emojis (`Zero-Emoji Standard`)**:
    - Queda prohibido el uso de emojis del sistema en cualquier pantalla, tarjeta, alerta, insignia o menú. Los emojis se renderizan distinto en Windows, macOS, iOS y Android, rompiendo la estética premium.
    - **Iconografía Vectorial Unificada**: Se utiliza `lucide-react` complementado con emblemas SVG geométricos personalizados (`viewBox="0 0 24 24"`, `fill="none"`, `stroke="currentColor"`, `stroke-width="1.75"`, `stroke-linecap="round"`, `stroke-linejoin="round"`).
-   - **Acabado Neón en Iconos**: Los íconos de escuelas, rachas y estados activos utilizan trazos en blanco/plata (`#F8FAFC`) sobre contenedores de cristal oscuro (`bg-white/[0.04] border border-white/15`) con efecto `drop-shadow(0 0 8px rgba(226, 232, 240, 0.4))`.
+   - **Acabado Liquid Platinum en Iconos**: Los íconos de escuelas, rachas y estados activos utilizan trazos en tinta obsidiana (`#090B0F`) o acento ámbar (`#D97706`) sobre contenedores `card-glass` en platino translúcido con bordes sutiles (`border-slate-900/10`) y reflejo especular.
 
-2. **Sistema Cromático "Obsidian Black & Electric Neon Silver"**:
-   - **Fondos Oscuros Profundos**:
-     - `--color-obsidian-950` (`#050608`): Fondo base del canvas con foco ambiental superior radial en platino.
-     - `--color-obsidian-900` (`#090B0E`): Superficie estructural para Sidebar, Topbar y Bottom Dock móvil.
-     - `--color-obsidian-800` (`#101319`): Superficie de tarjetas con borde sutil `border-white/[0.07]`.
-     - `--color-obsidian-700` (`#161B24`): Superficie elevada en estado `hover` o elemento seleccionado.
-   - **Acento Plateado Neón (`Liquid Chrome`)**:
-     - Gradiente metálico principal: `bg-gradient-to-b from-white via-slate-100 to-slate-300 text-[#050608]`.
-     - Halo luminoso: `shadow-[0_0_22px_-2px_rgba(226,232,240,0.35),0_0_8px_0_rgba(186,230,253,0.22),inset_0_1px_0_0_rgba(255,255,255,0.9)]`.
+2. **Sistema Cromático "Luminous Alabaster, Liquid Platinum & Obsidian Ink"**:
+   - **Lienzo y Superficies Luminosas**:
+     - `--color-alabaster` (`#F3F5F9`): Fondo base luminoso del canvas principal.
+     - `card-glass` (`Liquid Platinum`): Superficie de tarjetas con vidrio esmerilado, gradiente platino translúcido y borde sutil de alta precisión.
+     - `--color-obsidian-ink` (`#090B0F`): Tinta primaria de alto contraste para tipografía estructural, encabezados y controles activos.
+   - **Acento Ámbar y Tipografía Editorial**:
+     - `--color-amber-accent` (`#D97706`): Acento cálido para estados destacados, indicadores de progreso, alertas tempranas y llamadas a la acción clave.
+     - **Sistema Tipográfico**:
+       - `Playfair Display`: Títulos editoriales de alto impacto y encabezados principales.
+       - `Plus Jakarta Sans`: Tipografía de interfaz, cuerpo de texto, formularios y navegación.
+       - `JetBrains Mono`: Códigos de curso, hashes SHA-256, métricas numéricas, calificaciones y porcentajes tabulares.
 
 ---
 
@@ -88,20 +90,27 @@ Nexus está diseñado para sentirse instantáneo, vivo y sumamente intuitivo en 
 
 ---
 
-## 4. Anatomía de las 4 Vistas Principales (Diseño Vectorial & Responsive)
+## 4. Anatomía de las Vistas y Rutas del App Router (Diseño Vectorial & Responsive)
+
+Las rutas reales de **Nexus** en Next.js App Router aplican el sistema **Luminous Alabaster, Liquid Platinum & Obsidian Ink** con `@container` queries y cero emojis:
 
 ### 4.1 Inicio y Explorador de Facultades (`/`)
-- **Banner de Convocatoria Académica con Countdown en Vivo**: Diseño adaptativo (`flex-col lg:flex-row`) con reloj regresivo funcional segundo a segundo y CTA en Plateado Neón.
-- **Separador Interactivo de Novedades**: Píldora central `7 nuevas cohortes y cursos lanzados` que al hacer clic despliega suavemente las tarjetas de estreno.
+- **Banner de Convocatoria Académica con Countdown en Vivo**: Diseño adaptativo (`flex-col lg:flex-row`) con reloj regresivo funcional segundo a segundo y CTA en Obsidian Ink (`#090B0F`) con acento ámbar (`#D97706`).
+- **Separador Interactivo de Novedades**: Píldora central de nuevas cohortes y cursos lanzados que despliega suavemente las tarjetas de estreno en `card-glass`.
 - **Grilla Adaptativa de Escuelas (`@container`)**: Tarjetas con emblema vectorial SVG de alto contraste, indicador de rutas de aprendizaje y cohortes activas, y filtro de búsqueda instantáneo.
 
-### 4.2 Mi Progreso, Kardex ERP y Posición Semanal (`/student/progress`)
-- **Layout Responsivo**: En móvil y tablet se apila verticalmente (`grid-cols-1`); en escritorio se distribuye en proporción `xl:grid-cols-12` (`8 columnas` para la gráfica semanal interactiva + tarjetas de Kardex ERP y `4 columnas` para el Leaderboard semanal de la cohorte).
-- **Indicadores con Iconos SVG de Precisión**: Racha activa, promedio ponderado (`0-100`), porcentaje de asistencia con barra de umbral mínimo (`80%`) y ranking con indicadores vectoriales de ascenso.
+### 4.2 Rutas de Aprendizaje DAG (`/paths`) y Comercio (`/commerce`)
+- **`/paths`**: Visualizador y gestor de rutas curriculares con grafo dirigido acíclico (DAG) de prerrequisitos, estado de desbloqueo por curso y progreso acumulado.
+- **`/commerce`**: Catálogo transaccional de pago único, aplicación de cupones/becas, aprobación de órdenes pendientes y activación inmediata de matrículas en cohortes con cupo disponible.
 
-### 4.3 Perfil Verificable del Estudiante (`/u/[username]`)
-- **Banner Geométrico Cromo**: Composición vectorial en capas plateadas y obsidiana que se adapta a cualquier relación de aspecto.
-- **Cabecera Responsiva**: Avatar superpuesto con insignia de nivel, acciones adaptativas (`w-full sm:w-auto`) para `Editar perfil` y `Compartir perfil verificable` (con copiado interactivo de enlace y vista previa para reclutadores), más grilla responsiva (`grid-cols-2 sm:grid-cols-3 lg:grid-cols-5`) de métricas académicas y certificados SHA-256.
+### 4.3 Aula & ERP Académico (`/erp`)
+- Desglose de rubros ponderados ($\sum w_i = 100\%$), toma y consulta de asistencia por sesión con estados vectoriales claros, simulador interactivo de proyección de nota final y cierre/rectificación de actas.
 
-### 4.4 Libro de Calificaciones y Simulador ERP (`/student/erp` & `/instructor/gradebook`)
-- Desglose de rubros ponderados ($\sum w_i = 100\%$), control de asistencia por sesión con estados vectoriales claros y simulador interactivo de proyección de nota final.
+### 4.4 Mi Progreso y Kardex ERP (`/progress`) y Perfil Verificable (`/profile`)
+- **`/progress`**: En móvil y tablet se apila verticalmente (`grid-cols-1`); en escritorio se distribuye en proporción `xl:grid-cols-12` (`8 columnas` para la gráfica semanal interactiva + tarjetas de Kardex ERP y `4 columnas` para el Leaderboard semanal de la cohorte). Incluye racha activa, promedio ponderado (`0-100`), porcentaje de asistencia con umbral mínimo y ranking vectorial.
+- **`/profile`**: Banner geométrico en Liquid Platinum, cabecera responsiva con insignia de nivel, acciones adaptativas (`w-full sm:w-auto`) y grilla responsiva (`grid-cols-2 sm:grid-cols-3 lg:grid-cols-5`) de métricas académicas, insignias y certificados SHA-256.
+
+### 4.5 Verificación Pública (`/verify`), Analítica (`/analytics`) y Gestión IAM (`/admin/users`)
+- **`/verify`**: Portal público SSR de validación criptográfica SHA-256 para certificados emitidos (`VALID`, `REVOKED`, `NOT_FOUND`).
+- **`/analytics`**: Tablero ejecutivo con métricas en tiempo real de catálogo, ingresos/cupos, desempeño ERP y gamificación.
+- **`/admin/users`**: Consola de gobierno IAM para asignación de roles (`super_admin`, `coordinator`, `instructor`, `student`) y auditoría operativa.

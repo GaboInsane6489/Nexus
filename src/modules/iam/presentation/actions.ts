@@ -99,7 +99,7 @@ export async function assignUserRoleAction(
     };
   }
 
-  if (!canAssignTargetRole(currentUser.role, parsed.data.newRole)) {
+  if (!currentUser || !canAssignTargetRole(currentUser.role, parsed.data.newRole)) {
     return {
       success: false,
       error: {

@@ -32,7 +32,7 @@ flowchart TD
 - **Objetivo**: Dejar completamente documentada la arquitectura, el modelo de negocio, el esquema de 24 tablas, los diagramas de secuencia/estado/funcionalidad, el sistema de diseño y las Skills de IA en el repositorio antes de escribir una sola línea de código de aplicación.
 - **Entregables**:
   - [`README.md`](../README.md) y [`AGENTS.md`](../AGENTS.md) en la raíz del proyecto.
-  - 5 Skills especializadas en [`.agents/skills/`](../.agents/skills/).
+  - 6 Skills especializadas en [`.agents/skills/`](../.agents/skills/).
   - Documentos `00` al `07` en [`/docs`](./).
 
 ---
@@ -42,7 +42,7 @@ flowchart TD
 - **Módulos involucrados**: `src/shared/`, `src/modules/iam/`.
 - **Tablas SQL migradas en `ttywzvvemkydfuflsoxy`**: `profiles`, `user_roles`, `audit_logs` + funciones helper RLS (`current_user_role()`, `is_admin_or_coordinator()`, `is_super_admin()`, `rpc_assign_user_role()`).
 - **Estado Real Verificado (Deducción desde Hechos)**:
-  - [x] Código base Next.js + TypeScript estricto + Tailwind CSS v4 (`@theme` Obsidian & Neon Silver) inicializado y compilando.
+  - [x] Código base Next.js + TypeScript estricto + Tailwind CSS v4 (`@theme` Luminous Alabaster, Liquid Platinum & Obsidian Ink) inicializado y compilando.
   - [x] Proyecto real **`Nexus` (`id: ttywzvvemkydfuflsoxy`)** creado y activo (`ACTIVE_HEALTHY`) en `us-east-1`.
   - [x] Archivo `.env.local` configurado con la URL y llaves reales del proyecto.
   - [x] Migraciones `20261117030304_phase2_iam_and_core` y `20261117030424_phase2_security_and_rls_hardening` aplicadas en PostgreSQL 17.
@@ -106,3 +106,21 @@ flowchart TD
   - [x] Función RPC ejecutiva `public.fn_get_executive_analytics_snapshot()` desplegada en PostgreSQL 17 (`ttywzvvemkydfuflsoxy`) consolidando en tiempo real métricas curriculares, financieras/cupos, sesiones/evaluaciones ERP, insignias y certificados SHA-256.
   - [x] Módulo `src/modules/analytics/` implementado bajo arquitectura limpia y conectado en vivo a `/analytics`.
   - [x] Suite de verificación deductiva E2E (`npm run db:verify` en `scripts/verify-supabase.mjs`) validando las 28 tablas con RLS activo y ejecutando aserciones reales (`node:assert/strict`) sobre las funciones RPC de PostgreSQL.
+
+---
+
+## 3. Fases de Endurecimiento Productivo en Operación Real (*Real-Operation Production Hardening*)
+
+Tras completar las 7 fases fundacionales, **Nexus** incorpora una capa de endurecimiento operativo en PostgreSQL y Next.js App Router para garantizar operación real sin datos simulados ni estados inconsistentes:
+
+1. **Política Zero-Hardcode y Estado Real en Base de Datos**:
+   - Eliminación de catálogos, contadores, matrículas o notificaciones hardcodeadas en la interfaz o en memoria; toda vista lee y muta directamente contra PostgreSQL con RLS activo.
+   - Script reproducible de reinicio limpio [`supabase/reset_clean.sql`](../supabase/reset_clean.sql) para restablecer el esquema y los datos operativos verificados sin residuos de prueba.
+2. **Sistema de Notificaciones Persistentes (`notifications`)**:
+   - Tabla `public.notifications` protegida con RLS por usuario, conectada al Drawer de Notificaciones en tiempo real con conteo de no leídas, filtrado por categoría y marcado transaccional de lectura.
+3. **RPCs Atómicas Transaccionales (`PL/pgSQL`)**:
+   - `rpc_confirm_order_and_enroll`: Confirma el pago de una orden y activa atómicamente la matrícula (`enrollments`) validando cupos disponibles y prerrequisitos DAG.
+   - `rpc_approve_pending_order`: Permite a `super_admin` o `coordinator` aprobar órdenes pendientes (ej. transferencia bancaria) con registro de auditoría y activación de matrícula.
+   - `rpc_close_cohort_gradebook`: Verifica el invariante $\sum w_i = 100.00\%$ de los rubros de evaluación, consolida promedios finales/asistencia y sella la cohorte en estado `closed`.
+   - `rpc_award_xp_idempotent`: Otorga experiencia en `xp_ledger` bajo la clave única `(user_id, event_type, reference_id)` evitando duplicación de puntos y recalculando el nivel en `user_gamification`.
+   - `rpc_issue_certificate_on_completion`: Emite certificados verificables con hash criptográfico SHA-256 únicamente cuando se cumple la conjunción de nota mínima, asistencia mínima y orden en estado `paid`.

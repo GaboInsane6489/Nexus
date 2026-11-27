@@ -9,5 +9,10 @@ export {
   listIssuedCertificates,
   verifyCertificateByCodeRpc,
 } from './infrastructure/queries';
-export { verifyCertificateAction } from './presentation/actions';
+export type { IssuedCertificateResult } from './infrastructure/mutations';
+export {
+  verifyCertificateAction,
+  issueCertificateAction,
+  revokeCertificateAction,
+} from './presentation/actions';
 export { CertificateVerifierClient } from './presentation/components/CertificateVerifierClient';

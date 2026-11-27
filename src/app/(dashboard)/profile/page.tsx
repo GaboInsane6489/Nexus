@@ -1,7 +1,12 @@
 import React from 'react';
-import { getCurrentUserProfile, ProfileViewClient } from '@/modules/iam';
+import { redirect } from 'next/navigation';
+import { getCurrentUserProfile, listUserCertificates, ProfileViewClient } from '@/modules/iam';
 
 export default async function ProfilePage() {
   const profile = await getCurrentUserProfile();
-  return <ProfileViewClient initialProfile={profile} />;
+  if (!profile) {
+    redirect('/login');
+  }
+  const certificates = await listUserCertificates(profile.id);
+  return <ProfileViewClient initialProfile={profile} certificates={certificates} />;
 }

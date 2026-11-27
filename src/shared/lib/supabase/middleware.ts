@@ -53,9 +53,14 @@ export async function updateSessionAndEnforceRBAC(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const pathname = request.nextUrl.pathname;
-  const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/register');
+  const isPublicRoute =
+    pathname === '/api/health' ||
+    pathname.startsWith('/login') ||
+    pathname.startsWith('/register') ||
+    pathname === '/verify' ||
+    pathname.startsWith('/verify/');
 
-  if (!user && !isAuthRoute) {
+  if (!user && !isPublicRoute) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = '/login';
     return NextResponse.redirect(loginUrl);

@@ -6,4 +6,7 @@ export {
   calculateStreakMultiplier,
   buildGamificationSummary,
 } from './domain/rules';
-export { listCatalogBadgesWithStatus } from './infrastructure/queries';
+export {
+  listCatalogBadgesWithStatus,
+  getUserGamificationSummary,
+} from './infrastructure/queries';

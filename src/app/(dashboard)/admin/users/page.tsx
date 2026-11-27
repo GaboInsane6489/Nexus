@@ -1,4 +1,5 @@
 import React from 'react';
+import { redirect } from 'next/navigation';
 import {
   getCurrentUserProfile,
   listDirectoryUsers,
@@ -10,6 +11,10 @@ export default async function AdminUsersPage() {
     getCurrentUserProfile(),
     listDirectoryUsers(),
   ]);
+
+  if (!currentUser) {
+    redirect('/login');
+  }
 
   return (
     <AdminUsersConsoleClient

@@ -2,42 +2,121 @@
 
 import { createSupabaseServerClient } from '@/shared/lib/supabase/server';
 import type {
+  AttendanceStatus,
   ClassSessionEntity,
   CohortErpAuditSummary,
   CohortErpBundle,
   EvaluationItemEntity,
 } from '../domain/entities';
 
-export async function listCohortErpBundles(): Promise<CohortErpBundle[]> {
+export interface CohortStudentRosterItem {
+  enrollmentId: string;
+  studentId: string;
+  fullName: string;
+  email: string;
+  avatarUrl: string | null;
+  status: string;
+  finalGrade: number;
+  attendancePct: number;
+  academicRiskLevel: string;
+}
+
+export interface CohortAttendanceRecordItem {
+  id: string;
+  sessionId: string;
+  enrollmentId: string;
+  status: AttendanceStatus;
+  recordedAt: string;
+}
+
+export interface CohortSubmissionItem {
+  id: string;
+  evaluationId: string;
+  enrollmentId: string;
+  score: number | null;
+  instructorFeedback: string | null;
+  gradedAt: string | null;
+  submittedAt: string;
+}
+
+export interface CohortErpFullBundle extends CohortErpBundle {
+  enrollments: CohortStudentRosterItem[];
+  attendanceRecords: CohortAttendanceRecordItem[];
+  submissions: CohortSubmissionItem[];
+}
+
+export async function listCohortErpBundles(): Promise<CohortErpFullBundle[]> {
   const supabase = await createSupabaseServerClient();
 
-  const [cohortsRes, coursesRes, sessionsRes, evalItemsRes] = await Promise.all([
-    supabase
-      .from('cohorts')
-      .select(
-        'id, code, name, course_id, schedule_label, status'
-      )
-      .in('code', ['CS101-2027I-A', 'DB102-2027I-A', 'SEC201-2027I-A'])
-      .order('code', { ascending: true })
-      .limit(10),
+  const { data: cohortsData, error: cohortsError } = await supabase
+    .from('cohorts')
+    .select('id, code, name, course_id, schedule_label, status, start_date')
+    .order('start_date', { ascending: false })
+    .limit(20);
+
+  if (cohortsError || !cohortsData || cohortsData.length === 0) {
+    return [];
+  }
+
+  const cohortIds = cohortsData.map((c) => c.id);
+  const courseIds = Array.from(new Set(cohortsData.map((c) => c.course_id)));
+
+  const [coursesRes, sessionsRes, evalItemsRes, enrollmentsRes] = await Promise.all([
     supabase
       .from('courses')
       .select('id, code, title, min_passing_grade, min_attendance_pct')
-      .limit(20),
+      .in('id', courseIds),
     supabase
       .from('class_sessions')
       .select(
         'id, cohort_id, session_number, title, starts_at, ends_at, meeting_or_room_url, is_attendance_taken'
       )
-      .order('session_number', { ascending: true })
-      .limit(100),
+      .in('cohort_id', cohortIds)
+      .order('session_number', { ascending: true }),
     supabase
       .from('evaluation_items')
       .select(
         'id, cohort_id, title, type, weight_pct, due_date, allow_late_submission, sort_order'
       )
-      .order('sort_order', { ascending: true })
-      .limit(100),
+      .in('cohort_id', cohortIds)
+      .order('sort_order', { ascending: true }),
+    supabase
+      .from('enrollments')
+      .select(
+        'id, cohort_id, student_id, status, final_grade, attendance_pct, academic_risk_level'
+      )
+      .in('cohort_id', cohortIds),
+  ]);
+
+  const sessionRows = sessionsRes.data ?? [];
+  const evalRows = evalItemsRes.data ?? [];
+  const enrollmentRows = enrollmentsRes.data ?? [];
+
+  const sessionIds = sessionRows.map((s) => s.id);
+  const evalIds = evalRows.map((e) => e.id);
+  const studentIds = Array.from(new Set(enrollmentRows.map((enr) => enr.student_id)));
+
+  const [profilesRes, attendanceRes, submissionsRes] = await Promise.all([
+    studentIds.length > 0
+      ? supabase
+          .from('profiles')
+          .select('id, full_name, email, avatar_url')
+          .in('id', studentIds)
+      : Promise.resolve({ data: [] as { id: string; full_name: string; email: string; avatar_url: string | null }[] }),
+    sessionIds.length > 0
+      ? supabase
+          .from('attendance_records')
+          .select('id, session_id, enrollment_id, status, recorded_at')
+          .in('session_id', sessionIds)
+      : Promise.resolve({ data: [] as { id: string; session_id: string; enrollment_id: string; status: AttendanceStatus; recorded_at: string }[] }),
+    evalIds.length > 0
+      ? supabase
+          .from('submissions')
+          .select(
+            'id, evaluation_id, enrollment_id, score, instructor_feedback, graded_at, submitted_at'
+          )
+          .in('evaluation_id', evalIds)
+      : Promise.resolve({ data: [] as { id: string; evaluation_id: string; enrollment_id: string; score: number | null; instructor_feedback: string | null; graded_at: string | null; submitted_at: string }[] }),
   ]);
 
   const courseMap = new Map<
@@ -59,8 +138,22 @@ export async function listCohortErpBundles(): Promise<CohortErpBundle[]> {
     });
   }
 
+  const profileMap = new Map<
+    string,
+    { fullName: string; email: string; avatarUrl: string | null }
+  >();
+  for (const p of profilesRes.data ?? []) {
+    profileMap.set(p.id, {
+      fullName: p.full_name,
+      email: p.email,
+      avatarUrl: p.avatar_url,
+    });
+  }
+
   const sessionsByCohort = new Map<string, ClassSessionEntity[]>();
-  for (const s of sessionsRes.data ?? []) {
+  const sessionToCohort = new Map<string, string>();
+  for (const s of sessionRows) {
+    sessionToCohort.set(s.id, s.cohort_id);
     const arr = sessionsByCohort.get(s.cohort_id) ?? [];
     arr.push({
       id: s.id,
@@ -76,7 +169,9 @@ export async function listCohortErpBundles(): Promise<CohortErpBundle[]> {
   }
 
   const evalsByCohort = new Map<string, EvaluationItemEntity[]>();
-  for (const e of evalItemsRes.data ?? []) {
+  const evalToCohort = new Map<string, string>();
+  for (const e of evalRows) {
+    evalToCohort.set(e.id, e.cohort_id);
     const arr = evalsByCohort.get(e.cohort_id) ?? [];
     arr.push({
       id: e.id,
@@ -91,9 +186,59 @@ export async function listCohortErpBundles(): Promise<CohortErpBundle[]> {
     evalsByCohort.set(e.cohort_id, arr);
   }
 
-  const bundles: CohortErpBundle[] = [];
+  const enrollmentsByCohort = new Map<string, CohortStudentRosterItem[]>();
+  for (const enr of enrollmentRows) {
+    const profile = profileMap.get(enr.student_id);
+    const arr = enrollmentsByCohort.get(enr.cohort_id) ?? [];
+    arr.push({
+      enrollmentId: enr.id,
+      studentId: enr.student_id,
+      fullName: profile?.fullName ?? 'Estudiante',
+      email: profile?.email ?? '',
+      avatarUrl: profile?.avatarUrl ?? null,
+      status: enr.status,
+      finalGrade: Number(enr.final_grade ?? 0),
+      attendancePct: Number(enr.attendance_pct ?? 100),
+      academicRiskLevel: enr.academic_risk_level ?? 'normal',
+    });
+    enrollmentsByCohort.set(enr.cohort_id, arr);
+  }
 
-  for (const cohort of cohortsRes.data ?? []) {
+  const attendanceByCohort = new Map<string, CohortAttendanceRecordItem[]>();
+  for (const att of attendanceRes.data ?? []) {
+    const cohortId = sessionToCohort.get(att.session_id);
+    if (!cohortId) continue;
+    const arr = attendanceByCohort.get(cohortId) ?? [];
+    arr.push({
+      id: att.id,
+      sessionId: att.session_id,
+      enrollmentId: att.enrollment_id,
+      status: att.status as AttendanceStatus,
+      recordedAt: att.recorded_at,
+    });
+    attendanceByCohort.set(cohortId, arr);
+  }
+
+  const submissionsByCohort = new Map<string, CohortSubmissionItem[]>();
+  for (const sub of submissionsRes.data ?? []) {
+    const cohortId = evalToCohort.get(sub.evaluation_id);
+    if (!cohortId) continue;
+    const arr = submissionsByCohort.get(cohortId) ?? [];
+    arr.push({
+      id: sub.id,
+      evaluationId: sub.evaluation_id,
+      enrollmentId: sub.enrollment_id,
+      score: sub.score !== null && sub.score !== undefined ? Number(sub.score) : null,
+      instructorFeedback: sub.instructor_feedback,
+      gradedAt: sub.graded_at,
+      submittedAt: sub.submitted_at,
+    });
+    submissionsByCohort.set(cohortId, arr);
+  }
+
+  const bundles: CohortErpFullBundle[] = [];
+
+  for (const cohort of cohortsData) {
     const course = courseMap.get(cohort.course_id);
     const sessions = sessionsByCohort.get(cohort.id) ?? [];
     const evaluationItems = evalsByCohort.get(cohort.id) ?? [];
@@ -129,6 +274,9 @@ export async function listCohortErpBundles(): Promise<CohortErpBundle[]> {
       sessions,
       evaluationItems,
       audit,
+      enrollments: enrollmentsByCohort.get(cohort.id) ?? [],
+      attendanceRecords: attendanceByCohort.get(cohort.id) ?? [],
+      submissions: submissionsByCohort.get(cohort.id) ?? [],
     });
   }
 

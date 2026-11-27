@@ -1,5 +1,21 @@
 import type { Metadata } from 'next';
+import { Plus_Jakarta_Sans, Playfair_Display, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
+
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  variable: '--font-plus-jakarta',
+});
+
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  variable: '--font-playfair',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-jetbrains',
+});
 
 export const metadata: Metadata = {
   title: 'NEXUS — Plataforma Educativa Híbrida (LMS + ERP Académico)',
@@ -13,7 +29,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className="dark">
+    <html
+      lang="es"
+      className={`${plusJakarta.variable} ${playfair.variable} ${jetbrainsMono.variable}`}
+    >
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -28,7 +47,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-dvh bg-obsidian-950 text-silver-100 antialiased selection:bg-white selection:text-obsidian-950">
+      <body className="min-h-dvh bg-[#F3F5F9] text-[#090B0F] antialiased selection:bg-[#090B0F] selection:text-white">
         {children}
       </body>
     </html>

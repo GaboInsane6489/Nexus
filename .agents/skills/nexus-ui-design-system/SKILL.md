@@ -2,12 +2,12 @@
 name: nexus-ui-design-system
 description: >-
   Standards for building the Nexus user interface using React 19, Next.js App Router, and Tailwind CSS v4.
-  Enforces the signature "Obsidian Black & Electric Neon Silver" visual identity, strict Zero-Emoji policy (modern SVG icons only),
+  Enforces the signature "Luminous Alabaster, Liquid Platinum & Obsidian Ink" visual identity, strict Zero-Emoji policy (modern SVG icons only),
   fluid Mobile-First + Container Query responsive architecture without hardcoded offsets, and highly dynamic/intuitive UX.
   Use this skill when creating or styling UI components, layouts, and pages.
 ---
 
-# Nexus UI Design System Skill (Obsidian & Neon Silver — Tailwind CSS v4)
+# Nexus UI Design System Skill (Luminous Alabaster & Obsidian Ink — Tailwind CSS v4)
 
 Esta skill define las reglas obligatorias de diseño visual, iconografía vectorial, arquitectura responsive fluida e interactividad para **Nexus**.
 
@@ -20,12 +20,13 @@ Esta skill define las reglas obligatorias de diseño visual, iconografía vector
 1. **CERO EMOJIS (Strict Zero-Emoji Policy)**:
    - Prohibido usar emojis en cualquier parte de la interfaz (botones, menús, tarjetas de escuelas, rachas, notificaciones, estados vacíos).
    - Se utiliza exclusivamente **iconografía vectorial moderna de trazo fino** (`lucide-react` + SVGs geométricos personalizados con `strokeWidth={1.75}`).
-   - En estados activos o de énfasis, los íconos SVG reciben color `text-white` o `text-slate-100` acompañado de un filtro sutil `drop-shadow(0 0 8px rgba(241,245,249,0.45))`.
-2. **Estética "Obsidian Black & Electric Neon Silver"**:
-   - Canvas principal: `#050608` (`bg-obsidian-950`) con halo radial superior plateado.
-   - Superficies de navegación: `#090B0E` (`bg-obsidian-900`).
-   - Superficies de tarjetas: `#101319` (`bg-obsidian-800`) con `hover:bg-[#161B24]` y transición de borde `border-white/[0.07] hover:border-slate-200/40`.
-   - Acción Primaria (Plateado Neón): Gradiente especular `bg-gradient-to-b from-white via-slate-100 to-slate-300 text-obsidian-950 font-semibold` con resplandor `shadow-neon-silver`.
+   - En estados activos o de énfasis, los íconos SVG reciben color `text-[#090B0F]` (o `text-white` sobre superficies `btn-obsidian` / `nav-active-obsidian`) con transiciones sutiles de opacidad y contraste.
+2. **Estética "Luminous Alabaster, Liquid Platinum & Obsidian Ink"**:
+   - **Canvas principal**: Luminous Alabaster (`#F3F5F9`) con atmósfera `ambient-alabaster`.
+   - **Superficies Liquid Platinum**: Tarjetas translúcidas con clase utilitaria `card-glass` (borde especular sutil y desenfoque).
+   - **Tinta y Acción Primaria (Obsidian Ink)**: `#090B0F` aplicado en `btn-obsidian` y estado de navegación activo `nav-active-obsidian`, complementado por botones secundarios `btn-glass`.
+   - **Acento Cálido**: Ámbar cálido (`#D97706`) para resaltados editoriales, indicadores de progreso clave y estados de atención.
+   - **Tipografía Oficial**: `Playfair Display` (títulos editoriales), `Plus Jakarta Sans` (interfaz y cuerpo) y `JetBrains Mono` (códigos, métricas y datos tabulares).
 3. **Responsive Fluido en Todo Dispositivo (Prohibido el Responsive Hardcoded)**:
    - Nunca uses valores mágicos fijos en píxeles para posicionar paneles (ej. prohibido `left-[235px]` fijo sin contexto).
    - **Layout Grid Relativo**: El App Shell usa `grid` o `flex` relativo donde los paneles acoplados (como el Drawer de Notificaciones) se posicionan de forma natural en el flujo en Desktop (`md:relative` o anclados al contenedor padre `left-full`) y como `fixed inset-x-0 bottom-0` o `fixed inset-0` (Sheet modal deslizable) en Móvil.

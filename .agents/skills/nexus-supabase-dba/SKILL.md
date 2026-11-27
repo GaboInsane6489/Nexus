@@ -45,13 +45,18 @@ Toda migración inicial debe contar con estas funciones `SECURITY DEFINER` estab
    - `student`: Solo `SELECT` de sus propios registros de matrícula, asistencia y notas; `INSERT/UPDATE` únicamente en `submissions` mientras la fecha actual sea menor o igual a `due_date` y la cohorte esté `active`.
    - `instructor`: `SELECT` y `INSERT/UPDATE` de asistencia y calificaciones únicamente para cohortes donde `instructor_id = auth.uid()` y `cohort.status IN ('active', 'grading')`.
    - `coordinator` / `super_admin`: Acceso total y capacidad de cerrar actas (`cohort.status = 'closed'`).
+4. **Notificaciones (`public.notifications`)**:
+   - RLS obligatorio (`TO authenticated` con `(SELECT auth.uid())`): Cada usuario solo puede hacer `SELECT` y `UPDATE` (marcar como leída) de sus propias notificaciones (`user_id = (SELECT auth.uid())`).
+   - `INSERT`: Restringido a funciones `SECURITY DEFINER`, `service_role` o roles administrativos (`super_admin` / `coordinator`) según flujo.
 
 ## 4. Operaciones que DEBEN ser Funciones RPC Transaccionales (`PL/pgSQL`)
 
 Nunca ejecutes múltiples llamadas separadas desde el cliente para estos flujos críticos; encapsúlalos siempre en una función PostgreSQL transaccional (`rpc`):
 1. `rpc_confirm_order_and_enroll`: Marca la orden como `paid`, descuenta el cupo de la cohorte con bloqueo pesimista (`FOR UPDATE`), crea los registros en `enrollments` e inicializa el libro de gamificación.
-2. `rpc_close_cohort_gradebook`: Valida que los pesos de evaluación sumen `100%`, calcula `final_grade` y `attendance_pct` de todos los matriculados, determina `completed` vs `failed`, emite certificados para los aprobados y sella la cohorte en estado `closed`.
-3. `rpc_award_xp_idempotent`: Inserta en `xp_ledger` con `ON CONFLICT DO NOTHING`, recalcula `total_xp` y `current_level` en `user_gamification`, y evalúa desbloqueo de insignias.
+2. `rpc_approve_pending_order`: Permite a `super_admin` o `coordinator` aprobar una orden pendiente (`under_review` / transferencia manual), actualizarla a `paid`, activar la matrícula correspondiente y registrar la auditoría.
+3. `rpc_close_cohort_gradebook`: Valida que los pesos de evaluación sumen `100%`, calcula `final_grade` y `attendance_pct` de todos los matriculados, determina `completed` vs `failed`, emite certificados para los aprobados y sella la cohorte en estado `closed`.
+4. `rpc_award_xp_idempotent`: Inserta en `xp_ledger` con `ON CONFLICT DO NOTHING`, recalcula `total_xp` y `current_level` en `user_gamification`, y evalúa desbloqueo de insignias.
+5. `rpc_issue_certificate_on_completion`: Evalúa la conjunción de certificación (`final_grade >= min_passing_grade`, `attendance_pct >= min_attendance_pct` y orden `paid`) y emite de forma idempotente el registro verificable en `certificates` con código único y hash criptográfico.
 
 ## 5. Protocolo de Indexación Avanzada, Consultas y Optimización RLS
 
@@ -69,3 +74,8 @@ Para que **Nexus** mantenga tiempos de respuesta sub-20ms incluso con cientos de
    - **Prohibido `select('*')` en producción**: Especifica siempre las columnas exactas necesarias (ej. `.select('id, email, username, full_name, document_id, timezone, is_active, created_at')`) para reducir el payload de red y aprovechar *Index-Only Scans*.
    - **Paginación Basada en Cursores o Límite Estricto**: Toda consulta de listado debe incluir `.range(from, to)` o `.limit(N)` explícito; nunca traigas tablas sin acotar.
    - **Cero Consultas N+1**: Usa relaciones embebidas de PostgREST (`.select('id, full_name, user_roles(role)')`) o vistas/RPC en lugar de iterar consultas dentro de un bucle `for`.
+
+## 6. Limpieza y Reinicio Controlado (`supabase/reset_clean.sql`)
+
+- El script `supabase/reset_clean.sql` permite restablecer de forma limpia y determinista los datos de dominio y tablas en el esquema `public` (respetando el orden de dependencias y claves foráneas) antes de re-ejecutar migraciones o semillas (`supabase/seed.sql`) en entornos de desarrollo o staging.
+- Nunca ejecutes `supabase/reset_clean.sql` sobre producción sin respaldo previo y confirmación explícita.

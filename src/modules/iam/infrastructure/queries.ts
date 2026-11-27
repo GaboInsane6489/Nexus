@@ -1,202 +1,223 @@
 'use server';
 
-import { cookies } from 'next/headers';
 import { createSupabaseServerClient, isSupabaseConfigured } from '@/shared/lib/supabase/server';
 import type { AppRole, UserProfile } from '../domain/entities';
 
-const SEED_DIRECTORY_USERS: UserProfile[] = [
-  {
-    id: 'usr-gabriel-001',
-    email: 'gabriel.gonzalez@nexus.edu',
-    username: 'gabrielgg2005ve',
-    fullName: 'Gabriel Alexander Gonzalez Garcia',
-    documentId: 'V-29845102',
-    phone: '+58 412 5550192',
-    avatarUrl: null,
-    bio: 'Ingeniero de Software en formación · Especialización en Arquitectura Cloud, Next.js, TypeScript y Sistemas ERP.',
-    timezone: 'America/Caracas',
-    role: 'student',
-    isActive: true,
-    createdAt: '2026-01-15T12:00:00Z',
-    xpTotal: 2450,
-    currentLevel: 6,
-    streakDays: 14,
-    weightedGpa: 93.4,
-    attendancePct: 96.0,
-    verifiedCertificatesCount: 3,
-    completedCoursesCount: 5,
-  },
-  {
-    id: 'usr-coord-002',
-    email: 'elena.rodriguez@nexus.edu',
-    username: 'elena_coord_erp',
-    fullName: 'Dra. Elena Rodriguez Vance',
-    documentId: 'V-14920311',
-    phone: '+58 414 9001122',
-    avatarUrl: null,
-    bio: 'Coordinadora General de Ingeniería y Períodos Académicos (2027-I).',
-    timezone: 'America/Caracas',
-    role: 'coordinator',
-    isActive: true,
-    createdAt: '2025-11-04T09:30:00Z',
-    xpTotal: 5400,
-    currentLevel: 11,
-    streakDays: 32,
-    weightedGpa: 98.0,
-    attendancePct: 100.0,
-    verifiedCertificatesCount: 8,
-    completedCoursesCount: 12,
-  },
-  {
-    id: 'usr-inst-003',
-    email: 'marcus.sterling@nexus.edu',
-    username: 'msterling_arch',
-    fullName: 'Ing. Marcus Sterling',
-    documentId: 'E-84210944',
-    phone: '+57 300 4112233',
-    avatarUrl: null,
-    bio: 'Instructor Titular de Arquitectura de Sistemas Escalables y Bases de Datos PostgreSQL.',
-    timezone: 'America/Bogota',
-    role: 'instructor',
-    isActive: true,
-    createdAt: '2025-12-01T14:20:00Z',
-    xpTotal: 4120,
-    currentLevel: 9,
-    streakDays: 21,
-    weightedGpa: 95.5,
-    attendancePct: 98.5,
-    verifiedCertificatesCount: 6,
-    completedCoursesCount: 9,
-  },
-  {
-    id: 'usr-admin-004',
-    email: 'rectoria@nexus.edu',
-    username: 'nexus_superadmin',
-    fullName: 'Consejo Ejecutivo Nexus IAM',
-    documentId: 'J-00019283-9',
-    phone: '+1 305 5550199',
-    avatarUrl: null,
-    bio: 'Cuenta de Gobierno Institucional, Auditoría de Actas y Control de Roles RBAC.',
-    timezone: 'America/Caracas',
-    role: 'super_admin',
-    isActive: true,
-    createdAt: '2025-10-01T08:00:00Z',
-    xpTotal: 9850,
-    currentLevel: 16,
-    streakDays: 60,
-    weightedGpa: 99.2,
-    attendancePct: 100.0,
-    verifiedCertificatesCount: 14,
-    completedCoursesCount: 20,
-  },
-];
-
-export async function getCurrentUserProfile(): Promise<UserProfile> {
-  const cookieStore = await cookies();
-  const activeRoleCookie = (cookieStore.get('nexus_active_role')?.value as AppRole | undefined) ?? 'student';
-  const customNameCookie = cookieStore.get('nexus_profile_name')?.value;
-  const customUsernameCookie = cookieStore.get('nexus_profile_username')?.value;
-  const customDocCookie = cookieStore.get('nexus_profile_doc')?.value;
-  const customBioCookie = cookieStore.get('nexus_profile_bio')?.value;
-
-  if (isSupabaseConfigured()) {
-    try {
-      const supabase = await createSupabaseServerClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('id, email, username, full_name, document_id, phone, avatar_url, bio, timezone, is_active, created_at')
-          .eq('id', user.id)
-          .single();
-
-        const { data: roleRow } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id)
-          .single();
-
-        if (profile) {
-          return {
-            id: profile.id,
-            email: profile.email,
-            username: profile.username,
-            fullName: profile.full_name,
-            documentId: profile.document_id,
-            phone: profile.phone,
-            avatarUrl: profile.avatar_url,
-            bio: profile.bio,
-            timezone: profile.timezone,
-            role: (roleRow?.role as AppRole | undefined) ?? 'student',
-            isActive: profile.is_active,
-            createdAt: profile.created_at,
-            xpTotal: 2450,
-            currentLevel: 6,
-            streakDays: 14,
-            weightedGpa: 93.4,
-            attendancePct: 96.0,
-            verifiedCertificatesCount: 3,
-            completedCoursesCount: 5,
-          };
-        }
-      }
-    } catch {
-      // Fallback seguro si no hay conexión aún.
-    }
+export async function getCurrentUserProfile(): Promise<UserProfile | null> {
+  if (!isSupabaseConfigured()) {
+    return null;
   }
 
-  const baseProfile = SEED_DIRECTORY_USERS[0];
-  return {
-    ...baseProfile,
-    role: activeRoleCookie,
-    fullName: customNameCookie ?? baseProfile.fullName,
-    username: customUsernameCookie ?? baseProfile.username,
-    documentId: customDocCookie ?? baseProfile.documentId,
-    bio: customBioCookie ?? baseProfile.bio,
-  };
+  try {
+    const supabase = await createSupabaseServerClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return null;
+    }
+
+    const [
+      { data: profile, error: profileError },
+      { data: roleRow },
+      { data: gamification },
+      { count: certificatesCount },
+      { data: enrollments },
+    ] = await Promise.all([
+      supabase
+        .from('profiles')
+        .select(
+          'id, email, username, full_name, document_id, phone, avatar_url, bio, timezone, is_active, created_at'
+        )
+        .eq('id', user.id)
+        .single(),
+      supabase.from('user_roles').select('role').eq('user_id', user.id).maybeSingle(),
+      supabase
+        .from('user_gamification')
+        .select('total_xp, current_level, current_streak_days')
+        .eq('user_id', user.id)
+        .maybeSingle(),
+      supabase
+        .from('certificates')
+        .select('id', { count: 'exact', head: true })
+        .eq('student_id', user.id)
+        .eq('is_revoked', false),
+      supabase
+        .from('enrollments')
+        .select('status, final_grade, attendance_pct')
+        .eq('student_id', user.id),
+    ]);
+
+    if (profileError || !profile) {
+      return null;
+    }
+
+    const enrollmentRows = enrollments ?? [];
+    const completedCoursesCount = enrollmentRows.filter((e) => e.status === 'completed').length;
+    const weightedGpa =
+      enrollmentRows.length > 0
+        ? Number(
+            (
+              enrollmentRows.reduce((acc, e) => acc + Number(e.final_grade ?? 0), 0) /
+              enrollmentRows.length
+            ).toFixed(2)
+          )
+        : 0;
+    const attendancePct =
+      enrollmentRows.length > 0
+        ? Number(
+            (
+              enrollmentRows.reduce((acc, e) => acc + Number(e.attendance_pct ?? 0), 0) /
+              enrollmentRows.length
+            ).toFixed(2)
+          )
+        : 0;
+
+    return {
+      id: profile.id,
+      email: profile.email,
+      username: profile.username,
+      fullName: profile.full_name,
+      documentId: profile.document_id,
+      phone: profile.phone,
+      avatarUrl: profile.avatar_url,
+      bio: profile.bio,
+      timezone: profile.timezone,
+      role: (roleRow?.role as AppRole | undefined) ?? 'student',
+      isActive: profile.is_active,
+      createdAt: profile.created_at,
+      xpTotal: gamification?.total_xp ?? 0,
+      currentLevel: gamification?.current_level ?? 1,
+      streakDays: gamification?.current_streak_days ?? 0,
+      weightedGpa,
+      attendancePct,
+      verifiedCertificatesCount: certificatesCount ?? 0,
+      completedCoursesCount,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export interface UserCertificateSummary {
+  id: string;
+  verificationCode: string;
+  courseTitle: string;
+  finalGrade: number;
+  attendancePct: number;
+  issuedAt: string;
+  isRevoked: boolean;
+  signatureHash: string;
+}
+
+export async function listUserCertificates(userId: string): Promise<UserCertificateSummary[]> {
+  if (!isSupabaseConfigured() || !userId) {
+    return [];
+  }
+
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data: certRows, error } = await supabase
+      .from('certificates')
+      .select(
+        'id, verification_code, course_id, course_title_snapshot, final_grade_snapshot, attendance_pct_snapshot, issued_at, is_revoked, signature_hash'
+      )
+      .eq('student_id', userId)
+      .order('issued_at', { ascending: false });
+
+    if (error || !certRows || certRows.length === 0) {
+      return [];
+    }
+
+    const courseIds = Array.from(new Set(certRows.map((c) => c.course_id)));
+    const { data: courseRows } = await supabase
+      .from('courses')
+      .select('id, title')
+      .in('id', courseIds);
+
+    const courseTitleById = new Map<string, string>(
+      (courseRows ?? []).map((c) => [c.id, c.title])
+    );
+
+    return certRows.map((cert) => ({
+      id: cert.id,
+      verificationCode: cert.verification_code,
+      courseTitle: courseTitleById.get(cert.course_id) ?? cert.course_title_snapshot,
+      finalGrade: Number(cert.final_grade_snapshot ?? 0),
+      attendancePct: Number(cert.attendance_pct_snapshot ?? 0),
+      issuedAt: cert.issued_at,
+      isRevoked: cert.is_revoked,
+      signatureHash: cert.signature_hash,
+    }));
+  } catch {
+    return [];
+  }
 }
 
 export async function listDirectoryUsers(limit = 50): Promise<UserProfile[]> {
-  if (isSupabaseConfigured()) {
-    try {
-      const supabase = await createSupabaseServerClient();
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('id, email, username, full_name, document_id, phone, avatar_url, bio, timezone, is_active, created_at, user_roles(role)')
-        .eq('is_active', true)
-        .order('created_at', { ascending: false })
-        .limit(limit);
-
-      if (profiles && profiles.length > 0) {
-        return profiles.map((p: Record<string, unknown>) => ({
-          id: String(p.id),
-          email: String(p.email),
-          username: String(p.username),
-          fullName: String(p.full_name),
-          documentId: p.document_id ? String(p.document_id) : null,
-          phone: p.phone ? String(p.phone) : null,
-          avatarUrl: p.avatar_url ? String(p.avatar_url) : null,
-          bio: p.bio ? String(p.bio) : null,
-          timezone: String(p.timezone ?? 'America/Caracas'),
-          role: 'student',
-          isActive: Boolean(p.is_active),
-          createdAt: String(p.created_at),
-          xpTotal: 1200,
-          currentLevel: 4,
-          streakDays: 7,
-          weightedGpa: 88.5,
-          attendancePct: 92.0,
-          verifiedCertificatesCount: 1,
-          completedCoursesCount: 2,
-        }));
-      }
-    } catch {
-      // Usa el directorio institucional semilla en desarrollo local.
-    }
+  if (!isSupabaseConfigured()) {
+    return [];
   }
 
-  return SEED_DIRECTORY_USERS;
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data: profiles, error: profilesError } = await supabase
+      .from('profiles')
+      .select(
+        'id, email, username, full_name, document_id, phone, avatar_url, bio, timezone, is_active, created_at'
+      )
+      .eq('is_active', true)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (profilesError || !profiles || profiles.length === 0) {
+      return [];
+    }
+
+    const userIds = profiles.map((p) => p.id);
+
+    const [{ data: roles }, { data: gamifications }] = await Promise.all([
+      supabase.from('user_roles').select('user_id, role').in('user_id', userIds),
+      supabase
+        .from('user_gamification')
+        .select('user_id, total_xp, current_level, current_streak_days')
+        .in('user_id', userIds),
+    ]);
+
+    const roleByUserId = new Map<string, AppRole>(
+      (roles ?? []).map((r) => [r.user_id, r.role as AppRole])
+    );
+    const gamificationByUserId = new Map(
+      (gamifications ?? []).map((g) => [g.user_id, g])
+    );
+
+    return profiles.map((p) => {
+      const gamification = gamificationByUserId.get(p.id);
+      return {
+        id: p.id,
+        email: p.email,
+        username: p.username,
+        fullName: p.full_name,
+        documentId: p.document_id,
+        phone: p.phone,
+        avatarUrl: p.avatar_url,
+        bio: p.bio,
+        timezone: p.timezone,
+        role: roleByUserId.get(p.id) ?? 'student',
+        isActive: p.is_active,
+        createdAt: p.created_at,
+        xpTotal: gamification?.total_xp ?? 0,
+        currentLevel: gamification?.current_level ?? 1,
+        streakDays: gamification?.current_streak_days ?? 0,
+        weightedGpa: 0,
+        attendancePct: 0,
+        verifiedCertificatesCount: 0,
+        completedCoursesCount: 0,
+      };
+    });
+  } catch {
+    return [];
+  }
 }

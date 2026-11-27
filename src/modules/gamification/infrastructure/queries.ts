@@ -1,7 +1,8 @@
 'use server';
 
 import { createSupabaseServerClient } from '@/shared/lib/supabase/server';
-import type { BadgeEntity } from '../domain/entities';
+import type { BadgeEntity, UserGamificationSummary } from '../domain/entities';
+import { buildGamificationSummary } from '../domain/rules';
 
 export async function listCatalogBadgesWithStatus(
   userId?: string
@@ -20,10 +21,7 @@ export async function listCatalogBadgesWithStatus(
           .select('badge_id, awarded_at')
           .eq('user_id', userId)
           .limit(50)
-      : supabase
-          .from('user_badges')
-          .select('badge_id, awarded_at')
-          .limit(20),
+      : Promise.resolve({ data: [] as Array<{ badge_id: string; awarded_at: string }> }),
   ]);
 
   const unlockedMap = new Map<string, string>();
@@ -38,9 +36,28 @@ export async function listCatalogBadgesWithStatus(
     description: b.description,
     iconKey: b.icon_key,
     xpBonus: b.xp_bonus,
-    isUnlocked:
-      unlockedMap.has(b.id) ||
-      ['FIRST_STEP', 'STREAK_7', 'HONOR_ROLL'].includes(b.code),
-    awardedAt: unlockedMap.get(b.id) ?? null,
+    isUnlocked: Boolean(userId && unlockedMap.has(b.id)),
+    awardedAt: userId ? (unlockedMap.get(b.id) ?? null) : null,
   }));
+}
+
+export async function getUserGamificationSummary(
+  userId: string
+): Promise<UserGamificationSummary> {
+  const supabase = await createSupabaseServerClient();
+  const { data } = await supabase
+    .from('user_gamification')
+    .select(
+      'total_xp, current_streak_days, longest_streak_days, streak_freezes_available'
+    )
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  return buildGamificationSummary(
+    userId,
+    data?.total_xp ?? 0,
+    data?.current_streak_days ?? 0,
+    data?.longest_streak_days ?? 0,
+    data?.streak_freezes_available ?? 0
+  );
 }

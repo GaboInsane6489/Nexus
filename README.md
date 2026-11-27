@@ -3,7 +3,7 @@
 ![Next.js 15](https://img.shields.io/badge/Next.js-15.5_App_Router-050608?style=flat-square&logo=next.js&logoColor=F8FAFC)
 ![React 19](https://img.shields.io/badge/React-19.0_Server_Components-050608?style=flat-square&logo=react&logoColor=F8FAFC)
 ![TypeScript 5.8](https://img.shields.io/badge/TypeScript-5.8_Strict_Mode-050608?style=flat-square&logo=typescript&logoColor=F8FAFC)
-![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS-v4.0_Obsidian_&_Neon_Silver-050608?style=flat-square&logo=tailwindcss&logoColor=F8FAFC)
+![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS-v4.0_Alabaster_&_Obsidian_Ink-090B0F?style=flat-square&logo=tailwindcss&logoColor=F8FAFC)
 ![Supabase PostgreSQL 17](https://img.shields.io/badge/Supabase-PostgreSQL_17_&_RLS-050608?style=flat-square&logo=supabase&logoColor=F8FAFC)
 ![Architecture](https://img.shields.io/badge/Architecture-DDD_Modular_5_Levels-050608?style=flat-square)
 
@@ -154,7 +154,7 @@ El esquema productivo en Supabase cuenta con **28 tablas con Row Level Security 
 
 ## 5. Mapa de Rutas y Módulos Productivos
 
-La interfaz implementa el sistema de diseño **Obsidian Black (`#050608` / `#101319`) & Electric Neon Silver (`#F1F5F9`)** en **Tailwind CSS v4**, cumpliendo con la política estricta de **Cero Emojis** (iconografía vectorial `lucide-react` 100%) y arquitectura responsive fluida mediante **Container Queries (`@container`)**, **Sidebar Icon Rail** y **Bottom Dock móvil**:
+La interfaz implementa el sistema de diseño **Luminous Alabaster (`#F3F5F9`), Liquid Platinum (`card-glass`) & Obsidian Ink (`#090B0F`)** con acento ámbar cálido (`#D97706`) en **Tailwind CSS v4**, cumpliendo con la política estricta de **Cero Emojis** (iconografía vectorial `lucide-react` 100%) y arquitectura responsive fluida mediante **Container Queries (`@container`)**, **Sidebar Icon Rail** y **Bottom Dock móvil**:
 
 | Ruta App Router | Módulo / Nivel | Funcionalidad Principal |
 | :--- | :--- | :--- |
@@ -182,7 +182,7 @@ nexus/
 │       ├── nexus-supabase-dba/               # Estándares SQL, indexación INCLUDE/GIN y RLS con InitPlan
 │       ├── nexus-academic-erp-engine/        # Fórmulas de notas ponderadas, asistencia, riesgo y actas
 │       ├── nexus-gamification-certs/         # Ledger XP idempotente, rachas y certificados SHA-256
-│       └── nexus-ui-design-system/           # Estándares Tailwind CSS v4 (Obsidian & Neon Silver, Cero Emojis)
+│       └── nexus-ui-design-system/           # Estándares Tailwind CSS v4 (Luminous Alabaster & Obsidian Ink, Cero Emojis)
 ├── docs/                                     # Documentación maestra de arquitectura y negocio (00 al 07)
 ├── scripts/
 │   └── verify-supabase.mjs                   # Suite de auditoría E2E de las 28 tablas y funciones RPC
@@ -223,7 +223,7 @@ Toda decisión arquitectónica, matemática y de diseño se encuentra documentad
 | **04** | [**Diagramas de Procesos y Máquinas de Estado**](./docs/04-DIAGRAMAS-DE-PROCESOS-Y-FLUJOS.md) | Diagramas de secuencia de extremo a extremo y máquinas de estado (`cohort_status`, `order_status`, `enrollment_status`). |
 | **05** | [**Diagramas de Funcionalidad y Lógica de Motores**](./docs/05-LOGICA-FUNCIONAL-Y-MOTORES.md) | Especificación algorítmica de los motores DAG, Gradebook, Gamificación Anti-Farming y Certificados SHA-256. |
 | **06** | [**Roadmap de Ingeniería por Fases**](./docs/06-ROADMAP-POR-FASES.md) | Registro histórico y verificación empírica de las 7 fases de construcción del sistema. |
-| **07** | [**Sistema de Diseño, Layout Responsive y UX/UI**](./docs/07-SISTEMA-DE-DISENO-Y-UX-UI.md) | Especificación visual *Obsidian Black & Electric Neon Silver*, iconografía vectorial SVG y arquitectura responsive con Container Queries. |
+| **07** | [**Sistema de Diseño, Layout Responsive y UX/UI**](./docs/07-SISTEMA-DE-DISENO-Y-UX-UI.md) | Especificación visual *Luminous Alabaster, Liquid Platinum & Obsidian Ink*, iconografía vectorial SVG y arquitectura responsive con Container Queries. |
 
 ---
 

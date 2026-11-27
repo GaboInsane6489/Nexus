@@ -14,6 +14,16 @@ export {
   listAcademicTerms,
   listPublishedLearningPaths,
   getCurriculumDagSnapshot,
+  listUserCompletedCourseIds,
+  getActiveAcademicTerm,
 } from './infrastructure/queries';
-export { validateAndAddPrerequisiteAction } from './presentation/actions';
+export {
+  validateAndAddPrerequisiteAction,
+  createAcademicTermAction,
+  createLearningPathAction,
+  createCourseAction,
+  createCourseModuleAction,
+  createLessonAction,
+  deletePrerequisiteAction,
+} from './presentation/actions';
 export { CatalogDagExplorerClient } from './presentation/components/CatalogDagExplorerClient';

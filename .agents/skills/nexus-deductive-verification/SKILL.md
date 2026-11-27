@@ -41,3 +41,10 @@ Siempre separa tu reporte de avance en **dos categorías estrictas**:
 
 - En `src/modules/*/infrastructure/`, nunca ocultes la ausencia de Supabase devolviendo datos falsos como si vinieran de la base de datos.
 - Si `NEXT_PUBLIC_SUPABASE_URL` no está configurado o la tabla no existe en Supabase, el sistema debe informar con transparencia diagnóstica qué variable de entorno o tabla real falta configurar.
+
+---
+
+## 4. Regla Zero-Hardcode & No-Mock-Widgets
+
+- **Prohibido renderizar datos sintéticos en UI**: No uses arreglos hardcodeados en componentes, *countdowns* ficticios, *leaderboards* inventados ni simuladores de rol basados en `cookies`.
+- **Estados vacíos explícitos**: Cuando una tabla real en Supabase tenga `0` filas para una consulta válida, la interfaz debe renderizar un estado vacío explícito e informativo (sin rellenar con datos de ejemplo).

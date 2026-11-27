@@ -16,7 +16,12 @@ export {
   type UpdateProfileInput,
   type AssignUserRoleInput,
 } from './application/schemas';
-export { getCurrentUserProfile, listDirectoryUsers } from './infrastructure/queries';
+export {
+  getCurrentUserProfile,
+  listDirectoryUsers,
+  listUserCertificates,
+  type UserCertificateSummary,
+} from './infrastructure/queries';
 export {
   updateProfileAction,
   switchActiveRoleAction,

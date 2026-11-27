@@ -45,30 +45,30 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-dvh w-full flex flex-col justify-center items-center p-4 ambient-spotlight">
-      <div className="w-full max-w-lg card-obsidian rounded-2xl p-6 sm:p-8 space-y-6 shadow-[0_24px_60px_rgba(0,0,0,0.9)]">
+    <div className="min-h-dvh w-full flex flex-col justify-center items-center p-4 ambient-alabaster">
+      <div className="w-full max-w-lg card-glass rounded-3xl p-6 sm:p-8 space-y-6 animate-reveal">
         <div className="flex flex-col items-center text-center space-y-2">
-          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-white via-slate-200 to-slate-400 flex items-center justify-center shadow-[0_0_24px_rgba(255,255,255,0.4)]">
-            <Layers className="w-5 h-5 text-obsidian-950" strokeWidth={2.4} />
+          <div className="w-12 h-12 rounded-2xl bg-[#090B0F] flex items-center justify-center shadow-[0_10px_25px_rgba(9,11,15,0.24)]">
+            <Layers className="w-5 h-5 text-white" strokeWidth={2.2} />
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight pt-1">
+          <h1 className="font-serif text-2xl sm:text-3xl text-[#090B0F] tracking-tight pt-1">
             Apertura de Expediente Estudiantil
           </h1>
-          <p className="text-xs text-slate-400 max-w-sm">
+          <p className="text-xs text-slate-500 max-w-sm">
             Tus datos oficiales se vinculan al libro de calificaciones ERP y a la emisión de
             certificados SHA-256.
           </p>
         </div>
 
         {errorMsg && (
-          <div className="p-3 rounded-xl bg-red-500/15 border border-red-400/30 text-xs text-red-200">
+          <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-xs text-red-700 font-medium">
             {errorMsg}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4 text-xs">
           <div className="space-y-1.5">
-            <label className="text-slate-300 font-medium block">Nombre Completo Oficial</label>
+            <label className="text-slate-700 font-semibold block">Nombre Completo Oficial</label>
             <div className="relative">
               <User
                 className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"
@@ -80,14 +80,14 @@ export default function RegisterPage() {
                 placeholder="Ej. Gabriel Alexander Gonzalez Garcia"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full bg-[#090B0E] text-white pl-10 pr-4 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:border-white/50"
+                className="w-full bg-white text-[#090B0F] pl-10 pr-4 py-2.5 rounded-xl border border-slate-900/15 focus:outline-none focus:border-[#090B0F]"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-slate-300 font-medium block">Correo Electrónico</label>
+              <label className="text-slate-700 font-semibold block">Correo Electrónico</label>
               <div className="relative">
                 <Mail
                   className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"
@@ -99,13 +99,13 @@ export default function RegisterPage() {
                   placeholder="alumno@nexus.edu"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-[#090B0E] text-white pl-10 pr-4 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:border-white/50"
+                  className="w-full bg-white text-[#090B0F] pl-10 pr-4 py-2.5 rounded-xl border border-slate-900/15 focus:outline-none focus:border-[#090B0F]"
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-slate-300 font-medium block">Documento DNI / Cédula</label>
+              <label className="text-slate-700 font-semibold block">Documento DNI / Cédula</label>
               <div className="relative">
                 <FileBadge
                   className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"
@@ -117,7 +117,7 @@ export default function RegisterPage() {
                   placeholder="V-29845102"
                   value={documentId}
                   onChange={(e) => setDocumentId(e.target.value)}
-                  className="w-full bg-[#090B0E] text-white font-mono pl-10 pr-4 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:border-white/50"
+                  className="w-full bg-white text-[#090B0F] font-mono pl-10 pr-4 py-2.5 rounded-xl border border-slate-900/15 focus:outline-none focus:border-[#090B0F]"
                 />
               </div>
             </div>
@@ -125,7 +125,7 @@ export default function RegisterPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-slate-300 font-medium block">Zona Horaria</label>
+              <label className="text-slate-700 font-semibold block">Zona Horaria</label>
               <div className="relative">
                 <Globe
                   className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"
@@ -134,7 +134,7 @@ export default function RegisterPage() {
                 <select
                   value={timezone}
                   onChange={(e) => setTimezone(e.target.value)}
-                  className="w-full bg-[#090B0E] text-white pl-10 pr-4 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:border-white/50"
+                  className="w-full h-11 truncate bg-white text-[#090B0F] pl-10 pr-4 rounded-xl border border-slate-900/15 focus:outline-none focus:border-[#090B0F]"
                 >
                   <option value="America/Caracas">America/Caracas (GMT-4)</option>
                   <option value="America/Bogota">America/Bogota (GMT-5)</option>
@@ -145,7 +145,7 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-slate-300 font-medium block">Contraseña (Mín. 8 caract.)</label>
+              <label className="text-slate-700 font-semibold block">Contraseña (Mín. 8 caract.)</label>
               <div className="relative">
                 <Lock
                   className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"
@@ -158,7 +158,7 @@ export default function RegisterPage() {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-[#090B0E] text-white pl-10 pr-4 py-2.5 rounded-xl border border-white/15 focus:outline-none focus:border-white/50"
+                  className="w-full h-11 bg-white text-[#090B0F] pl-10 pr-4 rounded-xl border border-slate-900/15 focus:outline-none focus:border-[#090B0F]"
                 />
               </div>
             </div>
@@ -167,16 +167,16 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={isPending}
-            className="w-full btn-neon-silver py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full btn-obsidian py-3 rounded-full text-xs font-bold flex items-center justify-center gap-2 cursor-pointer"
           >
             <span>{isPending ? 'Registrando en IAM...' : 'Crear Expediente y Entrar'}</span>
-            <ArrowRight className="w-4 h-4" strokeWidth={2.2} />
+            <ArrowRight className="w-4 h-4" strokeWidth={2} />
           </button>
         </form>
 
-        <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
+        <div className="pt-4 border-t border-slate-900/10 flex items-center justify-between text-xs text-slate-500">
           <span>¿Ya tienes cuenta activa?</span>
-          <Link href="/login" className="text-white font-semibold hover:underline">
+          <Link href="/login" className="text-[#090B0F] font-bold hover:underline">
             Iniciar sesión →
           </Link>
         </div>

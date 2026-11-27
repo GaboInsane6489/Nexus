@@ -17,7 +17,7 @@ Este archivo define el contexto permanente, las reglas arquitectónicas y los es
   - **Lenguaje**: TypeScript en modo estricto (`strict: true`, prohibido el uso de `any`).
   - **UI & Estilos**: React + Tailwind CSS v4 (configuración CSS-first mediante `@theme` y variables CSS nativas).
   - **Identidad Visual y Estándares UX/UI**:
-    - **Paleta Oficial**: Negro Obsidiana (`#050608` / `#101319`) con Plateado Neón / Cromo Líquido (`#F1F5F9` con resplandor especular). Prohibido el verde estilo Platzi.
+    - **Paleta Oficial**: **Luminous Alabaster (`#F3F5F9`)**, **Liquid Platinum (`card-glass`)** y **Obsidian Ink (`#090B0F`)** con acento ámbar cálido (`#D97706`). Prohibido el verde estilo Platzi.
     - **Cero Emojis (Zero-Emoji Policy)**: Queda estrictamente prohibido el uso de emojis en cualquier componente de interfaz, botón, notificación, badge o estado. Toda la iconografía debe ser vectorial de alto nivel (`lucide-react` o SVGs geométricos personalizados con `stroke-width` consistente de `1.5` a `1.75`).
     - **Responsive Nativo y Fluido (Sin Hardcoding)**: Prohibido usar offsets o dimensiones rígidas hardcodeadas que rompan en móvil o tablet. Es obligatorio el diseño *Mobile-First* con clases utilitarias de Tailwind v4 (`sm:`, `md:`, `lg:`, `xl:`, `2xl:`), unidades dinámicas de viewport (`dvh`), y **Container Queries (`@container`)** para componentes modulares.
     - **Interactividad Dinámica e Intuitiva**: Uso obligatorio de actualizaciones optimistas (`useOptimistic`), Command Palette interactivo (`⌘K`), transiciones fluidas de estado, filtros instantáneos y navegación por teclado.
