@@ -96,9 +96,11 @@ services:
       WEBHOOK_URL: ${N8N_WEBHOOK_URL:-http://localhost/}
       NODE_FUNCTION_ALLOW_EXTERNAL: crypto,luxon
       N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: "true"
+      N8N_SECURE_COOKIE: "false"
+      NODE_OPTIONS: "--max-old-space-size=768"
     volumes:
       - n8n_data:/home/node/.n8n
-    mem_limit: 512m
+    mem_limit: 1024m
     depends_on:
       nexus-n8n-db:
         condition: service_healthy
